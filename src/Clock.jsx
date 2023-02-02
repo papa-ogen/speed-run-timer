@@ -1,15 +1,13 @@
 import React, { useEffect } from "react";
-
-const formatSeconds = (seconds) => {
-  var date = new Date(null);
-  date.setSeconds(seconds);
-  return date.toISOString().substr(11, 8);
-};
+import { formatSeconds } from "./helpers";
+import { saveTime } from "./localStorage";
 
 const Clock = ({ isStarted, timer, setTimer }) => {
   useEffect(() => {
     if (isStarted) {
-      const interval = setInterval(() => setTimer(timer + 1), 1000);
+      const increasedTimer = timer + 1;
+      const interval = setInterval(() => setTimer(increasedTimer), 1000);
+      saveTime(increasedTimer);
 
       return () => {
         clearInterval(interval);

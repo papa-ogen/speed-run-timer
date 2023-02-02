@@ -1,51 +1,90 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Clock from "./Clock";
-import CloseButton from "./CloseButton";
+import Header from "./Header";
+import {
+  clearTime,
+  fetchTime,
+  getRecordTime,
+  saveRecordTime,
+} from "./localStorage";
 
 function App() {
   const [isStarted, setIsStarted] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [recordtime, setRecordtime] = useState(0);
+
+  useEffect(() => {
+    const time = fetchTime();
+    if (time) setTimer(time);
+
+    const t = getRecordTime();
+    if (t) setRecordtime(t);
+  }, []);
+
+  const startTimer = () => {
+    setIsStarted(!isStarted);
+  };
 
   const resetTimer = () => {
     setTimer(0);
     setIsStarted(false);
+    clearTime();
+  };
+
+  const onSetRecordTime = () => {
+    saveRecordTime(timer);
+    setRecordtime(timer);
   };
 
   return (
     <main className="p-1">
-      <div className="flex">
-        <div className="flex-grow text-xs">Prev. record: 28:22:03</div>
-        <CloseButton />
-      </div>
+      <Header recordtime={recordtime} />
       <div className="flex space-x-2 pl-2">
         <Clock isStarted={isStarted} timer={timer} setTimer={setTimer} />
         <div className="space-x-2">
           <button
-            class={`${
+            className={`${
               !isStarted
                 ? "bg-green-500 hover:bg-green-700"
                 : "bg-red-500 hover:bg-red-700"
             } text-white font-bold py-1 px-3 rounded`}
-            onClick={() => setIsStarted(!isStarted)}
+            onClick={startTimer}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            {isStarted ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 5.25v13.5m-7.5-13.5v13.5"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
+                />
+              </svg>
+            )}
           </button>
           <button
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
-            onClick={() => resetTimer()}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded"
+            onClick={resetTimer}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +101,7 @@ function App() {
               />
             </svg>
           </button>
-          <button title="Save">
+          <button title="Save" onClick={onSetRecordTime}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
